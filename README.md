@@ -49,3 +49,12 @@ Unity Plugin designed for text localization
     	string appName = loc.Get("appName") //get string value by key
     
     }
+    
+# Editor Support
+
+A component named LocalizeUIText can be used for localizing `UnityEngine.UI.Text`'s content automatically .
+
+* Add LocalizeUIText component to the gameObject which owned UnityEngine.UI.Text
+* Set key on LocalizeUIText's inspector
+
+
