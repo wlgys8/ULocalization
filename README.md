@@ -1,6 +1,10 @@
 # ULocalization
 Unity Plugin designed for text localization
 
+* use json to config the localization strings.
+* support fallback
+* support custom loader
+
 # Setup
 
 1. Copy all files to your Unity Project
