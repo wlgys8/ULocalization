@@ -45,6 +45,7 @@ Unity Plugin designed for text localization
     		SystemLanguage.English, //fallback language
     		null, //custom loader, if pass null,Resources.Load will be used
     	)
+    	loc.Load()
     	string appName = loc.Get("appName") //get string value by key
     
     }
