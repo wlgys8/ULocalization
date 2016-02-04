@@ -10,6 +10,10 @@ namespace ULocalization{
 
 	public class Localize{
 
+		public static string defaultModuel{
+			get;set;
+		}
+
 		public static SystemLanguage preferLanguage{
 			get{
 				//return SystemLanguage.Chinese;
