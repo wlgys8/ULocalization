@@ -5,8 +5,9 @@ using ULocalization;
 public class example : MonoBehaviour {
 
 	void Awake(){
-		var systemLoc = new Localize("strings");
-		systemLoc.Load();
-		Debug.Log(systemLoc.Get("appName"));
+		Localize.Load("strings",delegate(Localize obj) {
+			
+		});
+		Debug.Log(Localize.active.Get("appName"));
 	}
 }

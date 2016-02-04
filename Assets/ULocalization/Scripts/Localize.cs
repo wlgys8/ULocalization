@@ -4,48 +4,68 @@ using UnityEngine.Serialization;
 using System.Collections.Generic;
 using LitJson;
 using System.IO;
+using System.Linq;
 
 namespace ULocalization{
 
 	public class Localize{
+
+		public static SystemLanguage preferLanguage{
+			get{
+				return SystemLanguage.Chinese;
+				//return Application.systemLanguage;
+			}
+		}
+
 		public static Localize active{
 			get;set;
+		}
+
+		private static Dictionary<string,Localize> _localizeMap = new Dictionary<string, Localize>();
+
+		public static void UnloadAll(){
+			_localizeMap.Clear();
+			Localize.active = null;
+
+		}
+
+
+		public static bool ExistModuel(string name){
+			return _localizeMap.ContainsKey(name);
+		}
+
+		public static Localize GetModuel(string name){
+			return _localizeMap[name];
+		}
+
+		public static string[] GetNames(){
+			return _localizeMap.Keys.ToArray();
 		}
 
 		private Collection _fallback;
 		private Collection _current;
 
-		private string _path;
-		private SystemLanguage _curLan;
-		private SystemLanguage _fallbackLan;
-		private string _filename;
 
-		private ILoader _loader;
-		private LocalizationMono _mono;
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ULocalization.Localize"/> class.
-		/// </summary>
-		/// <param name="filename">json filename.</param>
-		/// <param name="fallback">if a key was missing in current language json,
-		/// class will try to find it in fallback language json .</param>
-		/// <param name="loader">default loader is Resources.Load, your can implement your custom Loader.</param>
-		public Localize(string filename,
-			SystemLanguage fallback = SystemLanguage.English,ILoader loader = null){
-			_curLan = Application.systemLanguage;
-			_fallbackLan = fallback;
-			_filename = filename;
-			_loader = loader;
-			if(_loader == null){
-				_loader = new DefaultLoader();
+		private Localize(TextAsset current,TextAsset fallback){
+			try{
+				_current = JsonMapper.ToObject<Collection>(current.text);
+				if(fallback != null){
+					_fallback = JsonMapper.ToObject<Collection>(fallback.text);
+				}
+			}catch(System.Exception e){
+				Debug.LogException(e);
+				Debug.LogError("Json format is wrong!");
+				return;
 			}
-			_mono = new GameObject("Localization").AddComponent<LocalizationMono>();
 			Localize.active = this;
+			_localizeMap.Add(_current.moduelName,this);
 		}
 
-		public Localize(SystemLanguage overwriteLan,string filename,
-			SystemLanguage fallback = SystemLanguage.English,ILoader loader = null):this(filename,fallback,loader){
-			_curLan = overwriteLan;
+		private Localize(Collection current,Collection fallback){
+			_current = current;
+			_fallback = fallback;
+			Localize.active = this;
+			_localizeMap.Add(_current.moduelName,this);
 		}
 
 		/// <summary>
@@ -56,44 +76,8 @@ namespace ULocalization{
 			get;set;
 		}
 
-		/// <summary>
-		/// Load localization json files.
-		/// </summary>
-		public Coroutine Load(){
-			return _mono.StartCoroutine(_Load());
-		}
-
-		private IEnumerator _Load(){
-			var co = LoadCollection(_curLan,delegate(Collection c) {
-				_current = c;	
-			});
-			if(_current == null){
-				yield return co;
-			}
-
-			if(_fallbackLan != Application.systemLanguage){
-				co = LoadCollection(_fallbackLan,delegate(Collection c) {
-					_fallback = c;
-				});
-				if(_fallback == null){
-					yield return co;
-				}
-			}
-		}
-
-		private Coroutine LoadCollection(SystemLanguage lan,System.Action<Collection> onDone){
-			return _mono.StartCoroutine(_LoadCollection(lan,onDone));
-		}
-
-		private IEnumerator _LoadCollection(SystemLanguage lan,System.Action<Collection> onDone){
-			var filePath = Path.Combine(lan.ToString(),_filename);
-			_loader.StartLoad(filePath);
-			while(!_loader.isDone){
-				yield return null;
-			}
-			var txt = _loader.asset;
-			var col = JsonMapper.ToObject<Collection>(txt.text);
-			onDone(col);
+		public string[] GetAllKeys(){
+			return _current.strings.Keys.ToArray();
 		}
 
 		public string Get(string key){
@@ -117,28 +101,77 @@ namespace ULocalization{
 
 
 
-		private class DefaultLoader :ILoader{
-			public void StartLoad(string path){
-				this.asset = Resources.Load<TextAsset>(path);
-				this.isDone = true;
+		private static ILoader _defaultLoader = new DefaultLoader();
+
+
+		private static void LoadCollection(string moduelName,SystemLanguage lan,System.Action<Collection> onDone,ILoader loader = null){
+			var filePath = Path.Combine(lan.ToString(),moduelName);
+			if(loader == null){
+				loader = _defaultLoader;
 			}
-
-			public bool isDone{get;private set;}
-
-			public TextAsset asset{get;private set;}
+			loader.StartLoad(filePath,delegate(TextAsset txt) {
+				Collection col = null;
+				if(txt != null){
+					col = JsonMapper.ToObject<Collection>(txt.text);
+				}
+				onDone(col);
+			});
 		}
+
+
+		/// <summary>
+		/// Load localization json files.
+		/// </summary>
+		public static void Load(string moduelName,System.Action<Localize> onComplete,SystemLanguage? fallbackLan = null, ILoader loader = null){
+			SystemLanguage currentLan = Localize.preferLanguage;
+			LoadCollection(moduelName,currentLan,delegate(Collection current) {
+				if(fallbackLan !=null && fallbackLan != currentLan){
+					LoadCollection(moduelName,(SystemLanguage)fallbackLan,delegate(Collection fallback) {
+						Localize loc = null;
+						if(current != null){
+							loc = new Localize(current,fallback);
+						}
+						onComplete(loc);
+					},loader);
+				}else{
+					Localize loc = null;
+					if(current != null){
+						loc = new Localize(current,null);
+					}
+					onComplete(loc);
+				}
+			},loader);
+		}
+
+		public static Localize Load(TextAsset main,TextAsset fallback = null){
+			return new Localize(main,fallback);
+		}
+
+		private class DefaultLoader :ILoader{
+			public void StartLoad(string path,System.Action<TextAsset> onComplete){
+				var asset = Resources.Load<TextAsset>(path);
+				onComplete(asset);
+			}
+		}
+
+//		[UnityEditor.MenuItem("Assets/test")]
+//		public static void test(){
+//			var c= new Collection();
+//			c.moduelName ="strings";
+//			c.language = Application.systemLanguage.ToString();
+//			Debug.Log(JsonMapper.ToJson(c));
+//		}
 
 	}
 
-	internal class LocalizationMono:MonoBehaviour{
+	public class CollectionA{
+		public Dictionary<string,string> strings = new Dictionary<string, string>();
 
-		void Awake(){
-			GameObject.DontDestroyOnLoad(gameObject);
-		}
 	}
-
 	public class Collection{
 
+		public string moduelName;
+		public string language;
 		public Dictionary<string,string> strings = new Dictionary<string, string>();
 	
 		public string this[string key]{
@@ -153,10 +186,7 @@ namespace ULocalization{
 
 	public interface ILoader{
 
-		void StartLoad(string path);
+		void StartLoad(string path,System.Action<TextAsset> onComplete);
 
-		bool isDone{get;}
-
-		TextAsset asset{get;}
 	}
 }

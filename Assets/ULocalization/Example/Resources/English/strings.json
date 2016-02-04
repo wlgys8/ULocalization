@@ -1,5 +1,8 @@
-{"strings":{
-		"appName":"Star War"
-
-
-}}
+{
+	"moduelName":"strings",
+	"language":"English",
+	"strings":{
+			"appName":"star war",
+			"key":"value1"
+		}
+	}
