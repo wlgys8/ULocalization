@@ -4,7 +4,8 @@ Unity Plugin designed for text localization
 * use json to config the localization strings.
 * support fallback
 * support custom loader
-
+* support powerful editor operation
+* 
 # Setup
 
 1. Copy all files to your Unity Project
@@ -36,25 +37,23 @@ Unity Plugin designed for text localization
     	}
 	
         
-# Usage
+# Code Usage
 
     using ULocalization; //namespace
     
     void Start(){
-    	var loc = new Localize("strings", //json file name
-    		SystemLanguage.English, //fallback language
-    		null, //custom loader, if pass null,Resources.Load will be used
-    	)
-    	loc.Load();
-    	string appName = loc.Get("appName") //get string value by key
-    
+    	Localize.Load("moduelName", //moduel name
+    	delegate(localize){ //onloadComplete callback
+    	
+    	},SystemLanguage.Chinese, //fallback language
+    	null); //custom loader,if pass null,Resources.Load will be used
+	string appName =Localize.active.Get("appName") //get string value by key
     }
     
-# Editor Support
+# Editor Usage
 
 A component named LocalizeUIText can be used for localizing `UnityEngine.UI.Text`'s content automatically .
 
-* Add LocalizeUIText component to the gameObject which owned UnityEngine.UI.Text
-* Set key on LocalizeUIText's inspector
+待补充
 
 
