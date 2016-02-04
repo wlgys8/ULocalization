@@ -29,10 +29,12 @@ Unity Plugin designed for text localization
 3. json file format
 
         {
+        	"moduelName":"menu",
+        	"language":"English",
     		"strings":{
     			"appName":"Star War",
     			"key1":"value1",
-    			"key2":"value2",
+    			"key2":"value2"
     		}
     	}
 	
