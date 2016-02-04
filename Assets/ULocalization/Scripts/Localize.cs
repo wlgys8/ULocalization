@@ -12,8 +12,8 @@ namespace ULocalization{
 
 		public static SystemLanguage preferLanguage{
 			get{
-				return SystemLanguage.Chinese;
-				//return Application.systemLanguage;
+				//return SystemLanguage.Chinese;
+				return Application.systemLanguage;
 			}
 		}
 
