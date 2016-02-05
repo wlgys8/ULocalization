@@ -16,7 +16,7 @@ namespace ULocalization{
 				Localize.UnloadAll();
 				var uitexts = GameObject.FindObjectsOfType<LocalizeUIText>();
 				foreach(var uitext in uitexts){
-					EditorLocalize.LoadModuel(uitext.moduelName);
+					EditorLocalize.TryLoadModuelWithoutExtension(uitext.moduelName);
 					uitext.Reset();
 				}
 			}

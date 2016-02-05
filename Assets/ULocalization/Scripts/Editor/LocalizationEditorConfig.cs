@@ -49,9 +49,12 @@ namespace ULocalization{
 		public static void Select(){
 			Selection.activeObject = Instance;
 		}
-//
-//		public static void Apply(){
 
-//		}
+
+		[InitializeOnLoadMethod]
+		public static void EditorInitlize(){
+			//Localize.defaultFormat = Instance._defaultForamt;
+		}
+
 	}
 }

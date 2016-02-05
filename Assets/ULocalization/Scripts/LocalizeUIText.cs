@@ -14,14 +14,14 @@ public class LocalizeUIText : MonoBehaviour {
 	private string _key;
 
 	void Start(){
-		#if UNITY_EDITOR
-		if(!Application.isPlaying){
-			if(!Localize.ExistModuel(_moduelName)){
-				Localize.Load(_moduelName,delegate(Localize obj) {
-				});
-			}
-		}
-		#endif
+//		#if UNITY_EDITOR
+//		if(!Application.isPlaying){
+//			if(!Localize.ExistModuel(_moduelName)){
+//				Localize.Load(_moduelName,delegate(Localize obj) {
+//				});
+//			}
+//		}
+//		#endif
 		Reset();
 	}
 
@@ -43,20 +43,23 @@ public class LocalizeUIText : MonoBehaviour {
 
 
 	private string GetValue(string moduelName,string key){
-		_moduelName = moduelName;
-		_key = key;
+		Localize moduel = null;
 		if(!Localize.ExistModuel(moduelName)){ 
 			//if we do not find moduel by current name,try default module.
-			if(Localize.ExistModuel(Localize.defaultModuel)){
-				_moduelName = Localize.defaultModuel; 
+			if(Localize.ExistModuel(Localize.defaultModuelName)){
+				moduel = Localize.GetModuel(Localize.defaultModuelName);
 			}else{
 				return null;
 			}
+		}else{
+			moduel = Localize.GetModuel(moduelName);
 		}
-		var moduel = Localize.GetModuel(moduelName);
 		return moduel.Get(key);
 	}
+
 	public void Set(string moduelName,string key){
+		_moduelName = moduelName;
+		_key = key;
 		string value = GetValue(moduelName,key);
 		if(value == null){
 			return;
@@ -65,6 +68,8 @@ public class LocalizeUIText : MonoBehaviour {
 	}
 
 	public void Set(string moduelName,string key,params object[] ps){
+		_moduelName = moduelName;
+		_key = key;
 		string value = GetValue(moduelName,key);
 		if(value == null){
 			return;

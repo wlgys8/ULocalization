@@ -31,18 +31,43 @@ namespace ULocalization{
 		private static string _selectedModuel;
 		private static string _selectedKey;
 
+
+
+		private static string lastFocusedModuelName{
+			get{
+				return EditorPrefs.GetString(typeof(StringSelectWindow).Name+"_select_moduel_name","");
+			}set{
+				EditorPrefs.SetString(typeof(StringSelectWindow).Name+"_select_moduel_name",value);
+			}
+		}
+
+
+		private static int _focusedModuelIndex = -1;
+
 		private Localize _moduel;
-		private string _moduelName;
+		private string[] filenames;
 
 		void OnEnable(){
-			string[] moduels;
-			EditorLocalize.GetModuelNames(out moduels);
-			_moduelName = moduels[0];
-			_moduel = EditorLocalize.LoadModuel(_moduelName);
+			EditorLocalize.GetModuelFileNames(out filenames);
+			_focusedModuelIndex = System.Array.IndexOf(filenames,lastFocusedModuelName);
+			if(_focusedModuelIndex < 0){
+				_focusedModuelIndex = 0;
+			}
+			SelectModuel(_focusedModuelIndex);
+		}
 
+		void OnDisable(){
+			lastFocusedModuelName = filenames[_focusedModuelIndex];
+		}
+
+
+		private void SelectModuel(int index){
+			_focusedModuelIndex = index;
+			_moduel = EditorLocalize.LoadModuel(filenames[index]);
 			stringSet = _moduel.GetAllKeys().ToList();
 			filter = "";
 		}
+
 
 		private List<StringItemDrawer> _avaliableItems = new List<StringItemDrawer>();
 
@@ -72,12 +97,24 @@ namespace ULocalization{
 			if(GUI.changed){
 				this.filter = ret;
 			}
+			GUILayout.BeginHorizontal();
+			for(int i = 0;i<filenames.Length;i++){
+				var color = GUI.color;
+				if(_focusedModuelIndex == i){
+					GUI.color = Color.red;
+				}
+				if(GUILayout.Button(filenames[i])){
+					SelectModuel(i);
+				}
+				GUI.color = color;
+			}
+			GUILayout.EndHorizontal();
 			_scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 			foreach(var item in _avaliableItems){
 				if(item.DrawGUI()){
 					gotSelection = true;
 					_selectedKey = item.key;
-					_selectedModuel = _moduelName;
+					_selectedModuel = _moduel.moduelName;
 					this.Close();
 				}
 				GUILayout.Space(5);
