@@ -41,11 +41,11 @@ Unity Plugin designed for text localization
     	}
     	
 4. csv file format
-
-	language,English
-	appName,Star War
-	key1,value1
-	key2,value2
+	
+		language,English
+		appName,Star War
+		key1,value1
+		key2,value2
 	
         
 # Code Usage
