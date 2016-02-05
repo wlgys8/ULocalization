@@ -53,7 +53,7 @@ Unity Plugin designed for text localization
     using ULocalization; //namespace
     
     void Start(){
-    	Localize.Load("moduelName", //moduel name
+    	Localize.Load("module.json", // filename
     	delegate(localize){ //onloadComplete callback
     	
     	},SystemLanguage.Chinese, //fallback language
