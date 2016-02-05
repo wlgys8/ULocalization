@@ -1,11 +1,14 @@
 # ULocalization
 Unity Plugin designed for text localization
 
-* use json to config the localization strings.
+* use json/csv to config the localization strings.
+* support custom extension for config files(like xml)
 * support fallback
 * support custom loader
 * support powerful editor operation
-* 
+* support multi-module
+
+
 # Setup
 
 1. Copy all files to your Unity Project
@@ -49,7 +52,7 @@ Unity Plugin designed for text localization
     	
     	},SystemLanguage.Chinese, //fallback language
     	null); //custom loader,if pass null,Resources.Load will be used
-	string appName =Localize.active.Get("appName") //get string value by key
+	string appName =Localize.GetModule("moduleName").Get("appName") //get string value by key
     }
     
 # Editor Usage
