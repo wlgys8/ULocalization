@@ -109,7 +109,7 @@ namespace ULocalization{
 
 
 		private static void LoadCollection(string moduelName,SystemLanguage lan,System.Action<Collection> onDone,ILoader loader = null){
-			var filePath = Path.Combine(lan.ToString(),moduelName);
+			var filePath = lan.ToString()+"/"+moduelName;
 			if(loader == null){
 				loader = _defaultLoader;
 			}
@@ -117,6 +117,8 @@ namespace ULocalization{
 				Collection col = null;
 				if(txt != null){
 					col = JsonMapper.ToObject<Collection>(txt.text);
+				}else{
+					Debug.LogError("[Localize] Load failed:"+filePath);
 				}
 				onDone(col);
 			});
@@ -127,6 +129,11 @@ namespace ULocalization{
 		/// Load localization json files.
 		/// </summary>
 		public static void Load(string moduelName,System.Action<Localize> onComplete,SystemLanguage? fallbackLan = null, ILoader loader = null){
+			if(ExistModuel(moduelName)){
+				Debug.LogWarning("Already existed moduel : "+moduelName);
+				onComplete(GetModuel(moduelName));
+				return;
+			}
 			SystemLanguage currentLan = Localize.preferLanguage;
 			LoadCollection(moduelName,currentLan,delegate(Collection current) {
 				if(fallbackLan !=null && fallbackLan != currentLan){
@@ -168,10 +175,6 @@ namespace ULocalization{
 
 	}
 
-	public class CollectionA{
-		public Dictionary<string,string> strings = new Dictionary<string, string>();
-
-	}
 	public class Collection{
 
 		public string moduelName;
