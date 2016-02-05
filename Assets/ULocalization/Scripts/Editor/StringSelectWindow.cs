@@ -14,57 +14,57 @@ namespace ULocalization{
 			win.ShowPopup();
 		}
 
-		public static void Select(string moduel,string  key,out string selectModuel,out string selectKey){
+		public static void Select(string module,string  key,out string selectModule,out string selectKey){
 			if(gotSelection){
-				selectModuel = _selectedModuel;
+				selectModule = _selectedModule;
 				selectKey = _selectedKey;
 				gotSelection = false;
 				GUI.changed = true;
 			}else{
-				selectModuel = moduel;
+				selectModule = module;
 				selectKey = key;
 			}
 		}
 
 		public static bool gotSelection = false;
 
-		private static string _selectedModuel;
+		private static string _selectedModule;
 		private static string _selectedKey;
 
 
 
-		private static string lastFocusedModuelName{
+		private static string lastFocusedModuleName{
 			get{
-				return EditorPrefs.GetString(typeof(StringSelectWindow).Name+"_select_moduel_name","");
+				return EditorPrefs.GetString(typeof(StringSelectWindow).Name+"_select_module_name","");
 			}set{
-				EditorPrefs.SetString(typeof(StringSelectWindow).Name+"_select_moduel_name",value);
+				EditorPrefs.SetString(typeof(StringSelectWindow).Name+"_select_module_name",value);
 			}
 		}
 
 
-		private static int _focusedModuelIndex = -1;
+		private static int _focusedModuleIndex = -1;
 
-		private Localize _moduel;
+		private Localize _module;
 		private string[] filenames;
 
 		void OnEnable(){
-			EditorLocalize.GetModuelFileNames(out filenames);
-			_focusedModuelIndex = System.Array.IndexOf(filenames,lastFocusedModuelName);
-			if(_focusedModuelIndex < 0){
-				_focusedModuelIndex = 0;
+			EditorLocalize.GetModuleFileNames(out filenames);
+			_focusedModuleIndex = System.Array.IndexOf(filenames,lastFocusedModuleName);
+			if(_focusedModuleIndex < 0){
+				_focusedModuleIndex = 0;
 			}
-			SelectModuel(_focusedModuelIndex);
+			SelectModule(_focusedModuleIndex);
 		}
 
 		void OnDisable(){
-			lastFocusedModuelName = filenames[_focusedModuelIndex];
+			lastFocusedModuleName = filenames[_focusedModuleIndex];
 		}
 
 
-		private void SelectModuel(int index){
-			_focusedModuelIndex = index;
-			_moduel = EditorLocalize.LoadModuel(filenames[index]);
-			stringSet = _moduel.GetAllKeys().ToList();
+		private void SelectModule(int index){
+			_focusedModuleIndex = index;
+			_module = EditorLocalize.LoadModule(filenames[index]);
+			stringSet = _module.GetAllKeys().ToList();
 			filter = "";
 		}
 
@@ -81,7 +81,7 @@ namespace ULocalization{
 				});
 				_avaliableItems.Clear();
 				foreach(string key in keys){
-					_avaliableItems.Add(new StringItemDrawer(key,_moduel.Get(key)));
+					_avaliableItems.Add(new StringItemDrawer(key,_module.Get(key)));
 				}
 				_scrollPos = Vector2.zero;
 			}get{
@@ -100,11 +100,11 @@ namespace ULocalization{
 			GUILayout.BeginHorizontal();
 			for(int i = 0;i<filenames.Length;i++){
 				var color = GUI.color;
-				if(_focusedModuelIndex == i){
+				if(_focusedModuleIndex == i){
 					GUI.color = Color.red;
 				}
 				if(GUILayout.Button(filenames[i])){
-					SelectModuel(i);
+					SelectModule(i);
 				}
 				GUI.color = color;
 			}
@@ -114,7 +114,7 @@ namespace ULocalization{
 				if(item.DrawGUI()){
 					gotSelection = true;
 					_selectedKey = item.key;
-					_selectedModuel = _moduel.moduelName;
+					_selectedModule = _module.moduleName;
 					this.Close();
 				}
 				GUILayout.Space(5);

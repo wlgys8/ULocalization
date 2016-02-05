@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class LocalizeUIText : MonoBehaviour {
 
 	[SerializeField]
-	private string _moduelName = "default";
+	private string _moduleName = "default";
 
 	[SerializeField]
 	private string _key;
@@ -16,8 +16,8 @@ public class LocalizeUIText : MonoBehaviour {
 	void Start(){
 //		#if UNITY_EDITOR
 //		if(!Application.isPlaying){
-//			if(!Localize.ExistModuel(_moduelName)){
-//				Localize.Load(_moduelName,delegate(Localize obj) {
+//			if(!Localize.ExistModule(_moduleName)){
+//				Localize.Load(_moduleName,delegate(Localize obj) {
 //				});
 //			}
 //		}
@@ -26,12 +26,12 @@ public class LocalizeUIText : MonoBehaviour {
 	}
 
 	public void Reset(){
-		Set(_moduelName,_key);
+		Set(_moduleName,_key);
 	}
 
-	public string moduelName{
+	public string moduleName{
 		get{
-			return _moduelName;
+			return _moduleName;
 		}
 	}
 
@@ -42,35 +42,35 @@ public class LocalizeUIText : MonoBehaviour {
 	}
 
 
-	private string GetValue(string moduelName,string key){
-		Localize moduel = null;
-		if(!Localize.ExistModuel(moduelName)){ 
-			//if we do not find moduel by current name,try default module.
-			if(Localize.ExistModuel(Localize.defaultModuelName)){
-				moduel = Localize.GetModuel(Localize.defaultModuelName);
+	private string GetValue(string moduleName,string key){
+		Localize module = null;
+		if(!Localize.ExistModule(moduleName)){ 
+			//if we do not find module by current name,try default module.
+			if(Localize.ExistModule(Localize.defaultModuleName)){
+				module = Localize.GetModule(Localize.defaultModuleName);
 			}else{
 				return null;
 			}
 		}else{
-			moduel = Localize.GetModuel(moduelName);
+			module = Localize.GetModule(moduleName);
 		}
-		return moduel.Get(key);
+		return module.Get(key);
 	}
 
-	public void Set(string moduelName,string key){
-		_moduelName = moduelName;
+	public void Set(string moduleName,string key){
+		_moduleName = moduleName;
 		_key = key;
-		string value = GetValue(moduelName,key);
+		string value = GetValue(moduleName,key);
 		if(value == null){
 			return;
 		}
 		GetComponent<Text>().text = value;
 	}
 
-	public void Set(string moduelName,string key,params object[] ps){
-		_moduelName = moduelName;
+	public void Set(string moduleName,string key,params object[] ps){
+		_moduleName = moduleName;
 		_key = key;
-		string value = GetValue(moduelName,key);
+		string value = GetValue(moduleName,key);
 		if(value == null){
 			return;
 		}

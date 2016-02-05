@@ -12,6 +12,6 @@ public class example : MonoBehaviour {
 			
 		});
 
-		Debug.Log(Localize.GetModuel("menu").Get("appName"));
+		Debug.Log(Localize.GetModule("menu").Get("appName"));
 	}
 }

@@ -10,13 +10,13 @@ namespace ULocalization{
 
 	public class Localize{
 
-		public static string defaultModuelFile{
+		public static string defaultModuleFile{
 			get;set;
 		}
 
-		public static string defaultModuelName{
+		public static string defaultModuleName{
 			get{
-				return System.IO.Path.GetFileNameWithoutExtension(defaultModuelFile);
+				return System.IO.Path.GetFileNameWithoutExtension(defaultModuleFile);
 			}
 		}
 
@@ -41,7 +41,7 @@ namespace ULocalization{
 		static Localize(){
 			_decoderMap.Add("json",DecoderImpl.JsonDecode);
 			_decoderMap.Add("csv",DecoderImpl.CSVDecode);
-			defaultModuelFile = "default.json";
+			defaultModuleFile = "default.json";
 		}
 
 		public static void UnloadAll(){
@@ -49,15 +49,15 @@ namespace ULocalization{
 
 		}
 
-		public static bool ExistModuel(string name){
+		public static bool ExistModule(string name){
 			return _localizeMap.ContainsKey(name);
 		}
 
-		public static Localize GetModuel(string name){
+		public static Localize GetModule(string name){
 			return _localizeMap[name];
 		}
 
-		public static string[] GetModuelNames(){
+		public static string[] GetModuleNames(){
 			return _localizeMap.Keys.ToArray();
 		}
 
@@ -72,17 +72,17 @@ namespace ULocalization{
 
 		private Collection _fallback;
 		private Collection _current;
-		private string _moduelName;
+		private string _moduleName;
 
-		private Localize(string moduelName,Collection current,Collection fallback){
+		private Localize(string moduleName,Collection current,Collection fallback){
 			_current = current;
 			_fallback = fallback;
-			_moduelName = moduelName;
+			_moduleName = moduleName;
 		}
 
-		public string moduelName{
+		public string moduleName{
 			get{
-				return _moduelName;
+				return _moduleName;
 			}
 		}
 
@@ -114,7 +114,7 @@ namespace ULocalization{
 		private static ILoader _defaultLoader = new DefaultLoader();
 
 
-		private static void LoadCollection(string moduelName,string format,
+		private static void LoadCollection(string moduleName,string format,
 			SystemLanguage lan,
 			System.Action<Collection> onDone,
 			ILoader loader = null){
@@ -123,7 +123,7 @@ namespace ULocalization{
 				throw new System.Exception("there is no decoder for this format : "+format);
 			}
 			var decoder = _decoderMap[format];
-			var filePath = lan.ToString()+"/"+moduelName+"."+format;
+			var filePath = lan.ToString()+"/"+moduleName+"."+format;
 			if(loader == null){
 				loader = _defaultLoader;
 			}
@@ -148,41 +148,41 @@ namespace ULocalization{
 			ILoader loader = null){
 
 			string format = System.IO.Path.GetExtension(filename).Substring(1);
-			string moduelName = System.IO.Path.GetFileNameWithoutExtension(filename);
+			string moduleName = System.IO.Path.GetFileNameWithoutExtension(filename);
 
 			if(!_decoderMap.ContainsKey(format)){
 				throw new System.Exception("no decoder for format : "+format);
 			}
 
-			if(ExistModuel(moduelName)){
-				Debug.LogWarning("Already existed moduel : "+moduelName);
-				onComplete(GetModuel(moduelName));
+			if(ExistModule(moduleName)){
+				Debug.LogWarning("Already existed module : "+moduleName);
+				onComplete(GetModule(moduleName));
 				return;
 			}
 
 			SystemLanguage currentLan = Localize.preferLanguage;
-			LoadCollection(moduelName,format,currentLan,delegate(Collection main) {
+			LoadCollection(moduleName,format,currentLan,delegate(Collection main) {
 				if(fallbackLan !=null && fallbackLan != currentLan){
-					LoadCollection(moduelName,format,(SystemLanguage)fallbackLan,delegate(Collection fallback) {
+					LoadCollection(moduleName,format,(SystemLanguage)fallbackLan,delegate(Collection fallback) {
 						Localize loc = null;
 						if(main != null){
-							loc = new Localize(moduelName,main,fallback);
-							_localizeMap.Add(moduelName,loc);
+							loc = new Localize(moduleName,main,fallback);
+							_localizeMap.Add(moduleName,loc);
 						}
 						onComplete(loc);
 					},loader);
 				}else{
 					Localize loc = null;
 					if(main != null){
-						loc = new Localize(moduelName, main,null);
-						_localizeMap.Add(moduelName,loc);
+						loc = new Localize(moduleName, main,null);
+						_localizeMap.Add(moduleName,loc);
 					}
 					onComplete(loc);
 				}
 			},loader);
 		}
 
-		public static Localize Load(string moduelname,string format,TextAsset main,TextAsset fallback = null){
+		public static Localize Load(string modulename,string format,TextAsset main,TextAsset fallback = null){
 			if(!_decoderMap.ContainsKey(format)){
 				throw new System.Exception("thers is no decoder for foramt : "+format);
 			}
@@ -200,8 +200,8 @@ namespace ULocalization{
 				Debug.LogFormat("file content is wrong! {0}.{1}",main.name,format);
 				return null;
 			}
-			var loc = new Localize(moduelname, mainCol,fallbackCol);
-			_localizeMap.Add(moduelname,loc);
+			var loc = new Localize(modulename, mainCol,fallbackCol);
+			_localizeMap.Add(modulename,loc);
 			return loc;
 		}
 
@@ -219,7 +219,7 @@ namespace ULocalization{
 //		[UnityEditor.MenuItem("Assets/test")]
 //		public static void test(){
 //			var c= new Collection();
-//			c.moduelName ="strings";
+//			c.moduleName ="strings";
 //			c.language = Application.systemLanguage.ToString();
 //			Debug.Log(JsonMapper.ToJson(c));
 //		}
@@ -228,7 +228,7 @@ namespace ULocalization{
 
 	public class Collection{
 
-		public string moduelName;
+		public string moduleName;
 		public string language;
 		public Dictionary<string,string> strings = new Dictionary<string, string>();
 	

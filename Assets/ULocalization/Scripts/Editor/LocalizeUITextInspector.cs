@@ -12,24 +12,24 @@ public class LocalizeUITextInspector : Editor {
 	{
 		LocalizeUIText text = target as LocalizeUIText;
 
-		EditorGUILayout.LabelField("Moduel",text.moduelName);
+		EditorGUILayout.LabelField("Module",text.moduleName);
 		EditorGUILayout.LabelField("Label ",text.key);
 
 		if(GUILayout.Button("Select")){
 			StringSelectWindow.Show();
 		}
-		string selectModuel;
+		string selectModule;
 		string selectKey;
 		GUI.changed = false;
-		StringSelectWindow.Select(text.moduelName,text.key,out selectModuel,out selectKey);
+		StringSelectWindow.Select(text.moduleName,text.key,out selectModule,out selectKey);
 		if(GUI.changed){
-			SetUIText(selectModuel,selectKey);
+			SetUIText(selectModule,selectKey);
 		}
 	}
 
-	private void SetUIText(string moduelname,string key){
+	private void SetUIText(string modulename,string key){
 		var locText = target as LocalizeUIText;
-		locText.Set(moduelname,key);
+		locText.Set(modulename,key);
 		var txt = locText.GetComponent<UnityEngine.UI.Text>();
 		EditorUtility.SetDirty(txt);
 	}

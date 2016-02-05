@@ -9,7 +9,7 @@ namespace ULocalization{
 	public class EditorLocalize{
 
 
-		public static void GetModuelFileNames(out string[] names){
+		public static void GetModuleFileNames(out string[] names){
 			if(!LocalizationEditorConfig.hasFolder){
 				names = new string[]{};
 				return;
@@ -36,40 +36,40 @@ namespace ULocalization{
 			return LocalizationEditorConfig.folder + "/" + lan.ToString()+"/"+filename;
 		}
 
-		public static Localize LoadModuel(string filename){
-			string moduel = System.IO.Path.GetFileNameWithoutExtension(filename);
+		public static Localize LoadModule(string filename){
+			string module = System.IO.Path.GetFileNameWithoutExtension(filename);
 			string format = System.IO.Path.GetExtension(filename).Substring(1);
 			if(string.IsNullOrEmpty(format)){
 				throw new System.Exception("filename with extension need");
 			}
-			if(Localize.ExistModuel(moduel)){
-				return Localize.GetModuel(moduel);
+			if(Localize.ExistModule(module)){
+				return Localize.GetModule(module);
 			}
 			var file = GetPreferFilePath(filename);
 			if(!File.Exists(file)){
 				Debug.LogError("Unexist file: "+file);
 				return null;
 			}
-			return Localize.Load(moduel, format, AssetDatabase.LoadAssetAtPath<TextAsset>(file));
+			return Localize.Load(module, format, AssetDatabase.LoadAssetAtPath<TextAsset>(file));
 		}
 
 		/// <summary>
-		/// use {moduelname}+{support formats} to search files.
+		/// use {modulename}+{support formats} to search files.
 		/// if found,return the first one.
 		/// </summary>
-		/// <returns>The load moduel without extension.</returns>
-		/// <param name="moduelName">Moduel name.</param>
-		public static Localize TryLoadModuelWithoutExtension(string moduelName){
-			if(Localize.ExistModuel(moduelName)){
-				return Localize.GetModuel(moduelName);
+		/// <returns>The load module without extension.</returns>
+		/// <param name="moduleName">Module name.</param>
+		public static Localize TryLoadModuleWithoutExtension(string moduleName){
+			if(Localize.ExistModule(moduleName)){
+				return Localize.GetModule(moduleName);
 			}
 
 			foreach(var format in Localize.supportFormats){
-				string file = GetPreferFilePath(moduelName+"."+format);
+				string file = GetPreferFilePath(moduleName+"."+format);
 				if(!File.Exists(file)){
 					continue;
 				}
-				return Localize.Load(moduelName,format,AssetDatabase.LoadAssetAtPath<TextAsset>(file),null);
+				return Localize.Load(moduleName,format,AssetDatabase.LoadAssetAtPath<TextAsset>(file),null);
 			}
 			return null;
 		}
@@ -78,9 +78,9 @@ namespace ULocalization{
 		[InitializeOnLoadMethod]
 		static void Initilize(){
 			string[] filenames ;
-			GetModuelFileNames(out filenames);
+			GetModuleFileNames(out filenames);
 			foreach(var file in filenames){
-				LoadModuel(file);
+				LoadModule(file);
 			}
 		}
 
