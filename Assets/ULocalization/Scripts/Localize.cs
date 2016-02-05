@@ -71,11 +71,14 @@ namespace ULocalization{
 		}
 
 		private Collection _fallback;
-		private Collection _current;
+		private Collection _main;
 		private string _moduleName;
 
 		private Localize(string moduleName,Collection current,Collection fallback){
-			_current = current;
+			if(_main == null && fallback == null){
+				throw new System.Exception("Both main and fallback collection is null");
+			}
+			_main = current;
 			_fallback = fallback;
 			_moduleName = moduleName;
 		}
@@ -87,11 +90,17 @@ namespace ULocalization{
 		}
 
 		public string[] GetAllKeys(){
-			return _current.strings.Keys.ToArray();
+			if(_main == null){
+				return _fallback.strings.Keys.ToArray();
+			}
+			return _main.strings.Keys.ToArray();
 		}
 
 		public string Get(string key){
-			var value = _current[key];
+			string value = null;
+			if(_main != null){
+				value = _main[key];
+			}
 			if(value == null){
 				if(debug){
 					Debug.LogWarningFormat("Can not find key = {0},Try fallback...",key);
@@ -160,23 +169,19 @@ namespace ULocalization{
 				return;
 			}
 
-			SystemLanguage currentLan = Localize.preferLanguage;
-			LoadCollection(moduleName,format,currentLan,delegate(Collection main) {
-				if(fallbackLan !=null && fallbackLan != currentLan){
+			SystemLanguage mainLan = Localize.preferLanguage;
+			LoadCollection(moduleName,format,mainLan,delegate(Collection main) {
+				if(fallbackLan !=null && fallbackLan != mainLan){
 					LoadCollection(moduleName,format,(SystemLanguage)fallbackLan,delegate(Collection fallback) {
 						Localize loc = null;
-						if(main != null){
-							loc = new Localize(moduleName,main,fallback);
-							_localizeMap.Add(moduleName,loc);
-						}
+						loc = new Localize(moduleName,main,fallback);
+						_localizeMap.Add(moduleName,loc);
 						onComplete(loc);
 					},loader);
 				}else{
 					Localize loc = null;
-					if(main != null){
-						loc = new Localize(moduleName, main,null);
-						_localizeMap.Add(moduleName,loc);
-					}
+					loc = new Localize(moduleName, main,null);
+					_localizeMap.Add(moduleName,loc);
 					onComplete(loc);
 				}
 			},loader);
