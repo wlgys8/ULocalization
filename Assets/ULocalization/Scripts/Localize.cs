@@ -182,7 +182,11 @@ namespace ULocalization{
 			},loader);
 		}
 
-		public static Localize Load(string modulename,string format,TextAsset main,TextAsset fallback = null){
+
+		public static Localize Load(string modulename,
+			string format,
+			TextAsset main,
+			TextAsset fallback = null){
 			if(!_decoderMap.ContainsKey(format)){
 				throw new System.Exception("thers is no decoder for foramt : "+format);
 			}
