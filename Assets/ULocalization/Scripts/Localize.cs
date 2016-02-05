@@ -75,7 +75,7 @@ namespace ULocalization{
 		private string _moduleName;
 
 		private Localize(string moduleName,Collection current,Collection fallback){
-			if(_main == null && fallback == null){
+			if(current == null && fallback == null){
 				throw new System.Exception("Both main and fallback collection is null");
 			}
 			_main = current;
